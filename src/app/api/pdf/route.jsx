@@ -231,7 +231,8 @@ export async function GET(req, res) {
 	// const stream = await renderToStream(<MyDocument/>);
 	const url = new URL(req.url);
 
-	const queryString = url.search.slice(1);
+	// Next.js 15 re-serializes the query, so "?1234567" arrives as "?1234567="
+	const queryString = url.search.slice(1).replace(/=$/, "");
 	try {
 		const response = await fetch(`https://certificate.thepickleballscoreboard.com/wp-json/cac/v1/certificates/${queryString}`, {
 			cache: "no-cache",

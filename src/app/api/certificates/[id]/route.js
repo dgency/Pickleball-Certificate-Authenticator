@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 export async function GET(request, { params }) {
-	const { id } = params;
+	const { id } = await params;
 
 	try {
 		const response = await fetch(`https://certificate.thepickleballscoreboard.com/wp-json/cac/v1/certificates/${id}`, {
