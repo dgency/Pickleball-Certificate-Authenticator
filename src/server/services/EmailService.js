@@ -1,8 +1,16 @@
 import nodemailer from 'nodemailer';
 import { NextResponse } from 'next/server';
-// import { sendError } from '../global/sendError';
+import { sendError } from '../global/sendError';
 import { httpCode } from '../utils/httpCode';
 
+// Visitor input goes into the email's HTML, so escape it
+const escapeHtml = (value) =>
+    String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
 
 const emailTemplates = {
     CONTACT_FORM: {
@@ -10,16 +18,16 @@ const emailTemplates = {
         html: (data) => `
             <div style="background:#fff3f8; padding:20px;">
                 <h2 style="text-decoration:underline">Contact Form :</h2>
-                <p><span style="font-size:16px; font-weight:semi-bold">First Name:</span> 
-                    <span style="font-size:14px">${data?.firstName}</span></p>
-                <p><span style="font-size:16px; font-weight:semi-bold">Last Name:</span> 
-                    <span style="font-size:14px">${data?.lastName}</span></p>
-                <p><span style="font-size:16px; font-weight:semi-bold">Email:</span> 
-                    <span style="font-size:14px">${data?.email}</span></p>
-                <p><span style="font-size:16px; font-weight:semi-bold">Phone Number:</span> 
-                    <span style="font-size:14px">${data?.phoneNumber}</span></p>
-                <p><span style="font-size:16px; font-weight:semi-bold">Message:</span> 
-                    <span style="font-size:14px">${data?.message}</span></p>
+                <p><span style="font-size:16px; font-weight:semi-bold">First Name:</span>
+                    <span style="font-size:14px">${escapeHtml(data?.firstName)}</span></p>
+                <p><span style="font-size:16px; font-weight:semi-bold">Last Name:</span>
+                    <span style="font-size:14px">${escapeHtml(data?.lastName)}</span></p>
+                <p><span style="font-size:16px; font-weight:semi-bold">Email:</span>
+                    <span style="font-size:14px">${escapeHtml(data?.email)}</span></p>
+                <p><span style="font-size:16px; font-weight:semi-bold">Phone Number:</span>
+                    <span style="font-size:14px">${escapeHtml(data?.phoneNumber)}</span></p>
+                <p><span style="font-size:16px; font-weight:semi-bold">Message:</span>
+                    <span style="font-size:14px">${escapeHtml(data?.message)}</span></p>
             </div>
         `,
     },
@@ -47,7 +55,7 @@ export const EmailService = async (data, mode = '')=>{
     const mailOptions= {
         from: process.env.EMAIL_USER,
         to: process.env.EMAIL_USER,
-        subject: `Message from ${data?.firstName }`,
+        subject: `Message from ${String(data?.firstName ?? '').replace(/[\r\n]+/g, ' ')}`,
         replyTo: data?.email,
         html: template.html(data)
     }

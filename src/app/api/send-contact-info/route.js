@@ -16,13 +16,13 @@ export async function POST(req){
         const {firstName,lastName,email,phoneNumber,message,token} = await req.json()
 
         if(!token){
-            return{
-                success: false,
-                message: "Token not found"
-            }
+            return sendError(NextResponse, 'Token not found', null, httpCode.BAD_REQUEST)
         }
 
-        await verifyCaptchaToken(token) //verify the captcha token
+        const isHuman = await verifyCaptchaToken(token) //verify the captcha token
+        if (!isHuman) {
+            return sendError(NextResponse, 'reCAPTCHA verification failed.', null, httpCode.FORBIDDEN)
+        }
 
         if (!firstName || !lastName || !email || !phoneNumber || !message) {
             return sendError(NextResponse, 'Missing required fields.', null, httpCode.NOT_ACCEPTED)

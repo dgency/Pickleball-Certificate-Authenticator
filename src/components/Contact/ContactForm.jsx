@@ -1,6 +1,6 @@
 "use client"
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import contact from "../../../public/contact.svg";
 import axios from "axios";
 import { getCaptchaToken } from "@/server/utils/captcha";
@@ -18,50 +18,55 @@ function ContactForm() {
 		message: "",
 	});
 
-	const [isSuccess, setIsSuccess] = useState(false);
-
-	
+	const [isSending, setIsSending] = useState(false);
+	const [errorMessage, setErrorMessage] = useState("");
+	// A ref, not state, so a fast double click can't start a second submission before re-render.
+	const sendingRef = useRef(false);
 
 	const handleSubmit = async (e) => {
 		e.preventDefault();
 
-		const token = await getCaptchaToken();
-		const newData = { ...formData, token };
+		if (sendingRef.current) return;
+		if (formData.firstName === "" || formData.lastName === "" || formData.email === "" || formData.phoneNumber === "" || formData.message === "") return;
+
+		sendingRef.current = true;
+		setIsSending(true);
+		setErrorMessage("");
 
 		let text = document.querySelector(".text");
-		let send =document.querySelector(".send");
-		let loader =document.querySelector(".loader");
-		let success =document.querySelector(".success");
+		let send = document.querySelector(".send");
+		let loader = document.querySelector(".loader");
+		let success = document.querySelector(".success");
 
+		// Start the sending animation (the loader takes about 1.8s to fill)
+		text.classList.add("active");
+		send.classList.add("active");
+		loader.classList.add("active");
+		const animationDone = new Promise((resolve) => setTimeout(resolve, 1700));
 
-		if (formData.firstName !== "" && formData.lastName !== "" && formData.email !== "" && formData.phoneNumber !== "" && formData.message !== "") {
-			// Add 'active' class to elements
-			text.classList.add("active");
-			send.classList.add("active");
-			loader.classList.add("active");
+		let delivered = false;
+		try {
+			const token = await getCaptchaToken();
+			if (!token) throw new Error("reCAPTCHA token unavailable");
 
-			// Delay to add 'finished' class
-			setTimeout(function () {
-				loader.classList.remove("active");
-				text.classList.remove("active");
-				send.classList.remove("active");
-				setIsSuccess(true);
-			}, 1700);
-
-			// Delay to add 'active' class to '.done' element
-			setTimeout(function () {
-				success.classList.add("active");
-			}, 1600);
-
-			setTimeout(function () {
-				// document.querySelector(".done").classList.add("active");
-				success.classList.remove("active");
-			}, 4000);
+			const apiUrl = process.env.NEXT_PUBLIC_API_URL;
+			const response = await axios.post(`${apiUrl}/api/send-contact-info`, { ...formData, token });
+			delivered = response?.data?.success === true;
+		} catch (error) {
+			console.error("Error sending form:", error);
 		}
 
-		try {
-			const apiUrl = process.env.NEXT_PUBLIC_API_URL;
-			await axios.post(`${apiUrl}/api/send-contact-info`, newData);
+		await animationDone;
+		loader.classList.remove("active");
+		text.classList.remove("active");
+		send.classList.remove("active");
+
+		if (delivered) {
+			// Show success only after the API confirmed the email was sent
+			success.classList.add("active");
+			setTimeout(function () {
+				success.classList.remove("active");
+			}, 2400);
 
 			setFormData({
 				firstName: "",
@@ -70,10 +75,12 @@ function ContactForm() {
 				phoneNumber: "",
 				message: "",
 			});
-
-		} catch (error) {
-			console.error("Error sending form:", error);
+		} else {
+			setErrorMessage("Sorry, your message could not be sent. Please try again later.");
 		}
+
+		sendingRef.current = false;
+		setIsSending(false);
 	};
 
 	return (
@@ -142,7 +149,7 @@ function ContactForm() {
 						<div className="h-[70px]">
 							<div className="mt-5 flex justify-end relative">
 								<span className="relative w-full sm:w-[inherit]">
-									<button type="submit" className="send  w-full sm:w-[inherit]">
+									<button type="submit" disabled={isSending} aria-busy={isSending} className="send  w-full sm:w-[inherit]">
 										<div className="text font-[500] ">Send Message</div>
 										<div className="loader text-[12px]"></div>
 										{/* <div class="done">SUCCESS</div> */}
@@ -151,6 +158,11 @@ function ContactForm() {
 										<Lottie loop={true} animationData={check} className="h-[25px] sm:h-[30px] w-[25px] sm:w-[30px]" />
 										Success!!
 									</div>
+									{errorMessage && (
+										<p role="alert" className="absolute left-0 right-0 -bottom-8 text-center text-[14px] text-[#D92D20]">
+											{errorMessage}
+										</p>
+									)}
 								</span>
 							</div>
 						</div>

@@ -31,5 +31,7 @@ export async function verifyCaptchaToken(token) {
     const captchaData = await res.json()
 
     console.log(captchaData);
-    
+
+    // Google answers 200 even for invalid tokens, so the verdict is in `success`
+    return captchaData?.success === true;
 }
