@@ -131,8 +131,24 @@ const styles = StyleSheet.create({
 
 const MyDocument = ({ post }) => {
 	// Format the signed date
-	const signedDate = post?.signed_date ? new Date(post.signed_date) : null;
-	const formattedDate = signedDate ? signedDate.toLocaleDateString("en-CA") : "";
+	// const signedDate = post?.signed_date ? new Date(post.signed_date) : null;
+	// const formattedDate = signedDate ? signedDate.toLocaleDateString("en-CA") : "";
+
+	const date = (dateStr) => {
+
+		const date = new Date(dateStr);
+
+		if (isNaN(date.getTime())) {
+			return "Invalid Date"; // Handle invalid dates
+		}
+
+		const day = date.getDate().toString().padStart(2, "0");
+		const month = (date.getMonth() + 1).toString().padStart(2, "0");
+		const year = date.getFullYear();
+
+		return `${month}/${day}/${year}`; // MM/DD/YYYY format
+	};
+
 	return (
 		<Document>
 			<Page size="LETTER" style={styles.container}>
@@ -180,7 +196,7 @@ const MyDocument = ({ post }) => {
 							{/* Date Signed */}
 							<View style={styles.item}>
 								<Text style={styles.label}>
-									Date Signed - <Text style={styles.text}>{formattedDate}</Text>
+									Date Signed - <Text style={styles.text}>{date(post?.signed_date)}</Text>
 								</Text>
 							</View>
 						</View>

@@ -1,24 +1,42 @@
-
+"use client";
 import Image from "next/image";
 import React from "react";
 import logo from "../../../public/footer_logo.svg";
-import Lottie from "lottie-react";
+import dynamic from "next/dynamic";
+const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 import check from "../../../public/IsverifiedOk/check.json";
 import Button from "../Button/Button";
 
 function BodyContent({ post }) {
-
-
 	const date = (dateStr) => {
+		// const date = new Date(dateStr);
+		// const formattedDate = date.toLocaleDateString("en-us");
+		// return formattedDate;
+
+		// Try parsing with the Date object
 		const date = new Date(dateStr);
+		
+		if (!isNaN(date.getTime())) {
+			// If the date is valid, format it to MM/DD/YYYY
+			const day = date.getDate().toString().padStart(2, "0");
+			const month = (date.getMonth() + 1).toString().padStart(2, "0");
+			const year = date.getFullYear();
+			return `${month}/${day}/${year}`;
+		}
 
-		const formattedDate = date.toLocaleDateString("en-GB");
+		// Fallback to manual parsing if Date object fails
+		const parts = dateStr.split(" ")[0].split("-"); // Extract YYYY, MM, DD
 
-		return formattedDate;
+		if (parts.length === 3) {
+			const [year, month, day] = parts;
+			return `${month}/${day}/${year}`; // Format MM/DD/YYYY
+		}
+
+		return "Invalid Date"; // Handle completely incorrect formats
 	};
 
-	// console.log(post);
-	
+	console.log(post.signed_date);
+
 	return (
 		<div>
 			<div className="bg-[#EDEDED] py-5">
@@ -52,7 +70,7 @@ function BodyContent({ post }) {
 					<div className="">
 						<p className="text-[28px] sm:text-[32px] font-[600] text-[#212222] font-barlow">Signed By</p>
 						<div className="flex items-center gap-4 pt-3">
-							<img src={post?.signed_by_picture} height={100} width={100} alt=""   className="h-[100px] w-[100px] object-cover flex-none" />
+							<img src={post?.signed_by_picture} height={100} width={100} alt="" className="h-[100px] w-[100px] object-cover flex-none" />
 							<div className="max-w-[200px]">
 								<p className="text-[20px] text-[#262626] font-[500]">{post?.signed_by_player_name}</p>
 								<p className="text-[14px] text-[#262626]">{post?.signed_by_profession}</p>
@@ -68,7 +86,7 @@ function BodyContent({ post }) {
 					<Image src={logo} height={135} width={135} className="" alt="" />
 					<p className="pt-4 pb-8 text-[36px] font-[600]">Item Picture</p>
 					<div className="max-w-[500px]">
-						<img src={post?.item_images} height={550} width={500}  className="h-[550px] w-auto object-cover" alt="" />
+						<img src={post?.item_images} height={550} width={500} className="h-[550px] w-auto object-cover" alt="" />
 					</div>
 					<div className="flex flex-col items-center mt-10">
 						<p className="text-[28px] text-center font-barlow mb-3">Download Your Certificate </p>

@@ -1,6 +1,8 @@
+"use client"
 import React from "react";
 import SearchBar from "../SearchBar";
-import Lottie from "lottie-react";
+import dynamic from "next/dynamic";
+const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 import alert from "../../../public/IsverifiedFaild/alert.json";
 
 function FailedMessage({ input }) {

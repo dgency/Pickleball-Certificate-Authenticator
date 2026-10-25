@@ -1,7 +1,8 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { ReactTyped } from "react-typed";
-import Lottie from "lottie-react";
+import dynamic from "next/dynamic";
+const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 import search from "../../public/home/search.json";
 import { useGlobalState } from "@/context/GlobalStateContext";
 import Image from "next/image";

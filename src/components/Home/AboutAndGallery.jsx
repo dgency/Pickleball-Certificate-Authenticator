@@ -1,12 +1,12 @@
 import Image from "next/image";
 import React from "react";
-import gallery1 from "../../../public/home/gallery/1.png";
-import gallery2 from "../../../public/home/gallery/2.png";
-import gallery3 from "../../../public/home/gallery/3.png";
-import gallery4 from "../../../public/home/gallery/4.png";
-import gallery5 from "../../../public/home/gallery/5.png";
-import gallery6 from "../../../public/home/gallery/6.png";
-import about from "../../../public/home/about us.png";
+import gallery1 from "../../../public/home/gallery/Box Paddle.png";
+import gallery2 from "../../../public/home/gallery/Box_Shirt.png";
+import gallery3 from "../../../public/home/gallery/Box_Shorts.png";
+import gallery4 from "../../../public/home/gallery/Website_Image.png";
+import gallery5 from "../../../public/home/gallery/Website_Image2.png";
+import gallery6 from "../../../public/home/gallery/Paddle_3.png";
+import about from "../../../public/home/about.png";
 
 function AboutAndGallery({handleClik}) {
 	return (
@@ -35,7 +35,7 @@ function AboutAndGallery({handleClik}) {
 					</p>
 				</div>
 				<div className="flex-1 max-w-[500px]">
-					<Image src={about} height={600} width={500} className=" h-[600px] w-auto object-cover" alt="" />
+					<Image src={about} height={580} width={570} className=" " alt="" />
 				</div>
 			</div>
 			

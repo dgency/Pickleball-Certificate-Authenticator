@@ -1,15 +1,11 @@
-import AboutAndGallery from "@/components/Home/AboutAndGallery";
-import PurchaseIncludes from "@/components/Home/PurchaseIncludes";
-
-
+import GlobalContainer from "@/components/GlobalContainer";
 
 export default function page() {
 	
 	return (
 		<div className="">
+			<GlobalContainer />
 			
-			<AboutAndGallery />
-			<PurchaseIncludes />
 		</div>
 	);
 }
